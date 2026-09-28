@@ -183,9 +183,30 @@ section{min-height:100vh;min-height:100svh}
  .ln{max-width:16ch}
  #lb .in{padding-bottom:2rem}
 }
+/* SURPRISE + MOBILE GALLERY */
+#intro{position:fixed;inset:0;z-index:50;display:grid;place-content:center;justify-items:center;text-align:center;background:linear-gradient(#fff4ef,#fbd5dc);transition:opacity 1.4s,transform 1.4s;padding:5vw}
+#intro.gone{opacity:0;pointer-events:none;transform:scale(1.15)}
+.env{position:relative;width:min(78vw,340px);aspect-ratio:1.5;cursor:pointer;perspective:800px;animation:bob 3.5s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+.env>*{position:absolute}.env .bk{inset:0;background:#f4b4c1;border-radius:6px;box-shadow:0 24px 50px rgba(196,86,110,.35)}
+.env .card2{inset:8%;background:#fff;border-radius:4px;display:grid;place-items:center;font:1.5rem var(--hand);color:var(--rose);z-index:1;transition:transform 1.2s .5s cubic-bezier(.2,.8,.2,1)}
+.env .fr{inset:0;background:linear-gradient(135deg,#fbd0d8,#f4b4c1);clip-path:polygon(0 100%,0 0,50% 58%,100% 0,100% 100%);z-index:2}
+.env .fp{left:0;right:0;top:0;height:58%;background:#ee9db0;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;z-index:3;transition:transform .9s,z-index 0s}
+.env.open .fp{transform:rotateX(180deg);z-index:0;transition:transform .9s,z-index 0s .45s}.env.open .card2{transform:translateY(-62%)}
+.seal{left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e0526f,#9c1f45);color:#fff;display:grid;place-items:center;z-index:4;box-shadow:0 4px 12px rgba(120,20,50,.4);animation:beat2b 1.8s ease-in-out infinite;transition:opacity .4s}
+@keyframes beat2b{50%{transform:scale(1.15)}}.env.open .seal{opacity:0}
+#intro .hint{margin-top:2.4rem;font:italic 1.15rem var(--serif);color:var(--rose);animation:bob 2.5s ease-in-out infinite}
+body.intro #sky{z-index:60}body.intro #hero .l{animation:none}
+#prog{position:fixed;top:0;left:0;right:0;height:3px;z-index:40;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#f4a3b5,#c4566e)}
+#mbtn{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;border:0;z-index:9;background:rgba(255,255,255,.9);color:var(--rose);font-size:1.3rem;box-shadow:0 6px 18px rgba(196,86,110,.35);cursor:pointer}
+#mbtn.on{animation:spin 5s linear infinite}
+.ph img{filter:blur(10px) sepia(.9) brightness(1.1);transition:filter 2.6s ease .3s}.in .ph img,#lb .ph img{filter:none}
+@media(max-width:700px){
+ .table{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem .9rem;width:100%;padding:1rem 0;overflow:visible;scroll-snap-type:none}
+ .gi:nth-child(even){margin-top:2.4rem}.table .pol{width:100%;margin:0}
+}
 :root[data-theme="light"]{color-scheme:light}
 </style></head>
-<body class="locked">
+<body class="locked intro">
 <canvas id="sky"></canvas>
 <nav id="nav"></nav>
 <main id="app"></main>
@@ -264,7 +285,7 @@ $('#app').innerHTML=`
  <div class="scrap">${C.TIMELINE_EVENTS.map((e,i)=>`<div class="mem rv">${pol(C.PHOTOS[e.photo]||{},i,'')}<div class="note"><h3>${e.title}</h3><p>${e.text}</p></div></div>`).join('')}</div></section>
 
 <section id="c2">${chapter('c2','Two','Our Memories')}<p class="sub rv">Tap any photograph.</p>
- <div class="table rv">${C.PHOTOS.map((p,i)=>`<div data-i="${i}" style="display:contents">${pol(p,i)}</div>`).join('')}</div></section>
+ <div class="table">${C.PHOTOS.map((p,i)=>`<div class="gi rv" data-i="${i}">${pol(p,i)}</div>`).join('')}</div></section>
 
 <section id="c3">${chapter('c3','Three','Things I secretly love about you.')}<p class="sub rv">Open them, one by one.</p>
  <div class="cards">${C.LOVE_REASONS.map(r=>`<div class="card rv" tabindex="0"><div class="f"><div class="a">${r.t}</div><div class="b">${r.n}</div></div></div>`).join('')}</div></section>
@@ -317,18 +338,19 @@ $('.x',lb).onclick=closeLb;lb.onclick=e=>{if(e.target==lb)closeLb()};addEventLis
 
 /* love notes */
 $$('.card').forEach(c=>{const t=()=>{c.classList.toggle('open');if(c.classList.contains('open'))burst(c)};c.onclick=t;c.onkeydown=e=>{if(e.key=='Enter'||e.key==' '){e.preventDefault();t()}}});
-function burst(el){const r=el.getBoundingClientRect();for(let i=0;i<7;i++)pets.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:(Math.random()-.5)*3,vy:-Math.random()*2-.5,s:5+Math.random()*5,r:Math.random()*6,life:120,fall:1,h:1})}
+function burst(el){navigator.vibrate&&navigator.vibrate(15);const r=el.getBoundingClientRect();for(let i=0;i<7;i++)pets.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:(Math.random()-.5)*3,vy:-Math.random()*2-.5,s:5+Math.random()*5,r:Math.random()*6,life:120,fall:1,h:1})}
 
 /* music */
 const aud=$('#aud'),rec=$('#rec');
-$('#play').onclick=()=>{
+const togglePlay=()=>{
   const u=$('#url').value.trim();
   if(!u){toast('No song yet','Paste an audio URL below the record to play your song.');return}
   if(aud.src!==new URL(u,location.href).href)aud.src=u;
   aud.paused?aud.play().catch(()=>toast('Couldn’t play that link','Check the URL points to an audio file.')):aud.pause();
 };
-aud.onplay=()=>{rec.classList.add('playing');$('#play').textContent='Pause';boost=1};
-aud.onpause=aud.onended=()=>{rec.classList.remove('playing');$('#play').textContent='Play';boost=0};
+$('#play').onclick=togglePlay;
+aud.onplay=()=>{rec.classList.add('playing');$('#mbtn').classList.add('on');$('#play').textContent='Pause';boost=1};
+aud.onpause=aud.onended=()=>{rec.classList.remove('playing');$('#play').textContent='Play';$('#mbtn').classList.remove('on');boost=0};
 
 /* letter reveal */
 new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){$$('p',e.target).forEach((p,i)=>setTimeout(()=>p.classList.add('in'),1200+i*1800));o.disconnect()}}),{threshold:.35}).observe($('#paper'));
@@ -369,5 +391,10 @@ const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
     cx.save();cx.translate(p.x,p.y);cx.rotate(p.h?Math.sin(t/700+p.r)*.35:p.r);cx.globalAlpha=p.amb?.4:Math.min(1,p.life/40)*.85;cx.fillStyle=p.amb?'#f4a3b5':'#e06a86';if(p.h){const s=p.s;cx.beginPath();cx.moveTo(0,s*.35);cx.bezierCurveTo(-s,-s*.3,-s*.5,-s,0,-s*.4);cx.bezierCurveTo(s*.5,-s,s,-s*.3,0,s*.35);cx.fill()}else{cx.beginPath();cx.ellipse(0,0,p.s*.55,p.s,0,0,7);cx.fill()}cx.restore()}
   requestAnimationFrame(draw)})(0);
 addEventListener('click',e=>{if(e.target.closest('input'))return;for(let i=0;i<5;i++)pets.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*3,vy:-1-Math.random()*2,s:5+Math.random()*5,r:Math.random()*6,life:70,fall:1,h:1})});
+document.body.insertAdjacentHTML('beforeend',`<div id="prog"></div><button id="mbtn" aria-label="Music">♪</button><div id="intro"><p class="hand" style="font-size:1.7rem;margin-bottom:2.2rem">For ${C.HER_NAME}</p><div class="env"><div class="bk"></div><div class="card2">I love you</div><div class="fr"></div><div class="fp"></div><div class="seal">♥</div></div><p class="hint">tap the heart to open</p></div>`);
+function shower(n){for(let i=0;i<n;i++)setTimeout(()=>pets.push({x:Math.random()*innerWidth,y:innerHeight+10,vx:Math.random()-.5,vy:-1.6-Math.random(),s:8+Math.random()*9,r:Math.random()*6,life:320,fall:1,h:1}),i*90)}
+$('#mbtn').onclick=togglePlay;
+$('.env').onclick=async function(){if(this.classList.contains('open'))return;this.classList.add('open');shower(22);await wait(1800);$('#intro').classList.add('gone');document.body.classList.remove('intro');if(C.SONG_URL&&aud.paused)togglePlay();setTimeout(()=>$('#intro').remove(),1600)};
+addEventListener('scroll',()=>{const h=document.documentElement;$('#prog').style.transform='scaleX('+(h.scrollTop/((h.scrollHeight-h.clientHeight)||1))+')'},{passive:true});
 </script>
 </body></html>
