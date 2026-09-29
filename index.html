@@ -292,7 +292,7 @@ $('#app').innerHTML=`
  <button class="btn l" id="enter" style="animation-delay:5s">Enter Our Story ❤️</button></section>
 
 <section id="c1">${chapter('c1','One','The Beginning')}
- <div class="scrap">${C.TIMELINE_EVENTS.map((e,i)=>`<div class="mem rv">${pol(C.PHOTOS[e.photo]||{},i,'')}<div class="note"><h3>${e.title}</h3><p>${e.text}</p></div></div>`).join('')}</div></section>
+<div class="scrap">${C.TIMELINE_EVENTS.map((e,i)=>`<div class="mem rv">${pol(e,i,'')}<div class="note"><h3>${e.title}</h3><p>${e.text}</p></div></div>`).join('')}</div></section>
 
 <section id="c2">${chapter('c2','Two','Our Memories')}<p class="sub rv">Tap any photograph.</p>
  <div class="table">${C.PHOTOS.map((p,i)=>`<div class="gi rv" data-i="${i}">${pol(p,i)}</div>`).join('')}</div></section>
